@@ -94,9 +94,6 @@ int rtnl_wilddump_request(struct rtnl_handle *rth, int family, int type)
 	struct {
 		struct nlmsghdr nlh;
 		struct rtgenmsg g;
-		__u16 align_rta;	/* attribute has to be 32bit aligned */
-		struct rtattr ext_req;
-		__u32 ext_filter_mask;
 	} req;
 
 	memset(&req, 0, sizeof(req));
@@ -106,10 +103,6 @@ int rtnl_wilddump_request(struct rtnl_handle *rth, int family, int type)
 	req.nlh.nlmsg_pid = 0;
 	req.nlh.nlmsg_seq = rth->dump = ++rth->seq;
 	req.g.rtgen_family = family;
-
-	req.ext_req.rta_type = IFLA_EXT_MASK;
-	req.ext_req.rta_len = RTA_LENGTH(sizeof(__u32));
-	req.ext_filter_mask = RTEXT_FILTER_VF;
 
 	return send(rth->fd, (void*)&req, sizeof(req), 0);
 }
@@ -672,8 +665,8 @@ int parse_rtattr_byindex(struct rtattr *tb[], int max, struct rtattr *rta, int l
 			tb[i++] = rta;
 		rta = RTA_NEXT(rta,len);
 	}
-	if (len)
-		fprintf(stderr, "!!!Deficit %d, rta_len=%d\n", len, rta->rta_len);
+	//if (len)
+	//	fprintf(stderr, "!!!Deficit %d, rta_len=%d\n", len, rta->rta_len);
 	return i;
 }
 
